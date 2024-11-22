@@ -1,0 +1,15 @@
+kubectl apply -f grafana-pvc.yaml
+kubectl apply -f grafana-configmap.yaml
+kubectl apply -f grafana-task.yaml
+kubectl apply -f grafana-taskrun.yaml
+kubectl apply -f grafana-service.yaml
+
+kubectl port-forward service/grafana-service 3000:3000
+kubectl port-forward svc/grafana-service 3000:3000
+
+tkn taskrun logs run-grafana-run -f
+
+kubectl delete task run-grafana
+kubectl delete taskrun run-grafana-run
+kubectl delete pvc grafana-pvc
+kubectl delete service grafana-service
