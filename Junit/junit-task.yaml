@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: junit-task
+spec:
+  params:
+    - name: testCommand
+      type: string
+      default: "mvn test"
+    - name: reportPath
+      type: string
+      default: "/workspace/source/target/surefire-reports/*.xml"
+    - name: gitRepo
+      type: string
+      default: "https://github.com/rishabh0014/temp.git"
+  workspaces:
+    - name: source
+    - name: test-reports
+  steps:
+    - name: clone-repo
+      image: alpine/git
+      script: |
+        echo "Cloning the repository"
+        git clone $(params.gitRepo) /workspace/source
+
+    - name: run-tests
+      image: maven:3.6.3-jdk-11
+      workingDir: /workspace/source
+      script: |
+        echo "Running tests with command: $(params.testCommand)"
+        $(params.testCommand)
+
+    - name: copy-reports
+      image: busybox
+      script: |
+        echo "Copying JUnit test reports to workspace"
+        cp -r $(params.reportPath) /
+        # ls
+
